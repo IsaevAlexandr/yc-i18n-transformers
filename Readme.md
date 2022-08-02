@@ -42,9 +42,7 @@ npx yc-i18n-transformers --help
   // src/Button.tsx
   import i18n from "~/utils/i18n";
 
-  const Button = () => (
-    <Button>{i18n("example.keyset", "parrot", "Попугай", "Parrot")}</Button>
-  );
+  const Button = () => <Button>{i18n("example.keyset", "parrot")}</Button>;
   ```
 
 - and files with keysets will be emitted near the transformed file
@@ -72,3 +70,11 @@ npx yc-i18n-transformers --help
   +           │   keyset.json
   +           │   context.json
   ```
+
+## Quick try
+
+```sh
+git clone https://github.com/IsaevAlexandr/yc-i18n-transformers.git
+cd yc-i18n-transformers/examples/singleKeysetDir
+npx yc-i18n-transformers -s ui/**/*.(ts|tsx|js|jsx) -k i18n/keysets -n i18nCODEMODE
+```
