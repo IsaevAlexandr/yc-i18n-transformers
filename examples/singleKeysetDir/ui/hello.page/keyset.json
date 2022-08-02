@@ -1,0 +1,16 @@
+{
+  "context": "",
+  "status": {
+    "title": {
+      "ru": "APPROVED",
+      "en": "APPROVED"
+    }
+  },
+  "allowedStatuses": [
+    "APPROVED",
+    "EXPIRED",
+    "GENERATED",
+    "REQUIRES_TRANSLATION",
+    "TRANSLATED"
+  ]
+}
