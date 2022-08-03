@@ -111,6 +111,24 @@ export class Keyset implements KeysetBase {
   private serializeJson = (data: unknown): string =>
     JSON.stringify(data, null, 4);
 
+  private sortObjectKeys = (obj: Object) => {
+    return Object.keys(obj)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+      }, {});
+  };
+
+  private sortKeysetKeys = (obj: KeysetValue) => {
+    obj.en = this.sortObjectKeys(obj.en);
+    obj.ru = this.sortObjectKeys(obj.ru);
+    obj.keyset.status = this.sortObjectKeys(obj.keyset.status);
+    obj.context = this.sortObjectKeys(obj.context);
+
+    return obj;
+  };
+
   private writeSyncKeyset = async (
     payload: KeysetValue
   ): Promise<KeysetValue> => {
@@ -118,23 +136,26 @@ export class Keyset implements KeysetBase {
       fs.mkdirSync(this.dirPath, { recursive: true });
     }
 
+    // add yargs option and flag here if keys sorting will not be needed
+    const sortedKeysPayload = this.sortKeysetKeys(payload);
+
     fs.writeFileSync(
       path.join(this.dirPath, "context.json"),
-      this.serializeJson(payload.context)
+      this.serializeJson(sortedKeysPayload.context)
     );
     fs.writeFileSync(
       path.join(this.dirPath, "keyset.json"),
-      this.serializeJson(payload.keyset)
+      this.serializeJson(sortedKeysPayload.keyset)
     );
 
     for (const lang in Lang) {
       fs.writeFileSync(
         path.join(this.dirPath, `${lang}.json`),
-        this.serializeJson(payload[lang])
+        this.serializeJson(sortedKeysPayload[lang])
       );
     }
 
-    return payload;
+    return sortedKeysPayload;
   };
 
   private readSyncKeysetValue = (

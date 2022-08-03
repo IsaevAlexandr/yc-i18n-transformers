@@ -49,11 +49,15 @@ const start = async () => {
 
   const paths = await globby([...argv.source]);
 
-  await jscodeshift(path.join(__dirname, "transform.js"), paths, {
-    verbose: 0,
-    parser: "tsx",
-    runInBand: true,
-  });
+  try {
+    await jscodeshift(path.join(__dirname, "transform.js"), paths, {
+      verbose: 0,
+      parser: "tsx",
+      runInBand: true,
+    });
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 start();

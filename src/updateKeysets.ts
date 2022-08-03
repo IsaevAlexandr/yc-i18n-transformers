@@ -33,7 +33,7 @@ export const updateKeysets = async (data: DataForKeysets) => {
           context: "",
           en: {
             allowedStatus: AllowedStatuses.REQUIRES_TRANSLATION,
-            value: en,
+            value: en || ru,
           },
           ru: { allowedStatus: AllowedStatuses.EXPIRED, value: ru },
         };
