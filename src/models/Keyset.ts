@@ -109,7 +109,7 @@ export class Keyset implements KeysetBase {
   };
 
   private serializeJson = (data: unknown): string =>
-    JSON.stringify(data, null, 4);
+    JSON.stringify(data, null, 2);
 
   private sortObjectKeys = (obj: Object) => {
     return Object.keys(obj)

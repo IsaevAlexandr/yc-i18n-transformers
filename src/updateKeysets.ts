@@ -30,7 +30,6 @@ export const updateKeysets = async (data: DataForKeysets) => {
       ([keyName, { en, ru }]) => {
         return {
           name: keyName,
-          context: "",
           en: {
             allowedStatus: AllowedStatuses.REQUIRES_TRANSLATION,
             value: en || ru,
