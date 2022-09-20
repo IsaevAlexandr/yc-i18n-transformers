@@ -30,6 +30,7 @@ const Hello: React.FC<HelloProps> = ({ name }) => {
         )}
       </h1>
       <div>{i18nCODEMODE("hello.page", "description")}</div>
+      <div>{i18nCODEMODE("hello.page", "counter", "{count} apples")}</div>
     </div>
   );
 };
