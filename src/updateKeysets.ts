@@ -1,5 +1,5 @@
 import path from "path";
-import { KEYSET_REPLACE_KEYWORD, AllowedStatuses } from "./const";
+import { KEYSET_REPLACE_KEYWORD, AllowedStatuses, PLURALS_COUNT } from "./const";
 import { Keyset } from "./models/Keyset";
 
 export type DataForKeysets = Record<
@@ -28,13 +28,19 @@ export const updateKeysets = async (data: DataForKeysets) => {
 
     const batchPayload = Object.entries(data[keysetName].keyData).map(
       ([keyName, { en, ru }]) => {
+        const ruValue = typeof ru === 'string' && ru.includes('{count}')
+            ? Array(PLURALS_COUNT).fill(ru)
+            : ru;
+        const enValue = en && typeof en === 'string' && en.includes('{count}')
+              ? Array(PLURALS_COUNT).fill(en)
+              : en
         return {
           name: keyName,
           en: {
             allowedStatus: AllowedStatuses.REQUIRES_TRANSLATION,
-            value: en || ru,
+            value: enValue || ruValue,
           },
-          ru: { allowedStatus: AllowedStatuses.EXPIRED, value: ru },
+          ru: { allowedStatus: AllowedStatuses.EXPIRED, value: ruValue },
         };
       }
     );

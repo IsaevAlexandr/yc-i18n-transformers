@@ -39,3 +39,5 @@ export const DEFAULT_KEYSET: KeysetValue = {
 };
 
 export const KEYSET_REPLACE_KEYWORD = "<keyset>";
+
+export const PLURALS_COUNT = 6;
