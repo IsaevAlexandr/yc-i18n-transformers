@@ -5,7 +5,7 @@
     "url": "git@github.com/IsaevAlexandr/yc-i18n-transformers.git"
   },
   "homepage": "https://github.com/IsaevAlexandr/yc-i18n-transformers#yc-i18n-transformers",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "bin": {
     "yc-i18n-gui": "bin/yc-i18n-transformers.js"
   },
