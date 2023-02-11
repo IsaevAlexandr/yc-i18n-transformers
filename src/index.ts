@@ -50,7 +50,7 @@ const argv = yargs(hideBin(process.argv))
 
   .demandOption(
     "source",
-    "Specify source file directory. You can specify multiple paths here. For example:\n\t-s src/some/path/to/*\n\t-s src/path/* src/more/path/*"
+    "Specify source file directory. You can specify multiple paths here. For example:\n\t-s src/some/path/to\n\t-s src/path src/more/path"
   )
   .demandOption(
     "name",
