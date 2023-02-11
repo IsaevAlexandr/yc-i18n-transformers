@@ -1,7 +1,8 @@
 import { FileInfo, API, Options } from "jscodeshift";
 import { DataForKeysets, updateKeysets } from "./updateKeysets";
 
-const CODEMODE_FUN_NAME = process.env.CODEMODE_FUN_NAME || "i18nCODEMODE";
+const CODEMODE_FUN_NAME = process.env.CODEMODE_FUN_NAME;
+const TRANSFORM_KEYSET_NAME = process.env.TRANSFORM_KEYSET_NAME;
 const TARGET_FN_NAME = "i18n";
 
 const printOptions = {
@@ -54,6 +55,10 @@ export default async function (file: FileInfo, api: API, options: Options) {
       // get information about arguments
 
       let params = null;
+
+      if (TRANSFORM_KEYSET_NAME) {
+        path.node.arguments.unshift(j.stringLiteral(TRANSFORM_KEYSET_NAME));
+      }
 
       const [keyset, keyName, ru, en] = path.node.arguments.reduce<
         (string | string[])[]

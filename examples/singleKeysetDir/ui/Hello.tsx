@@ -30,6 +30,14 @@ const Hello: React.FC<HelloProps> = ({ name }) => {
         )}
       </h1>
       <div>{i18nCODEMODE("hello.page", "description")}</div>
+      <div>
+        {i18nCODEMODE(
+          "first.keyset",
+          "to_modify",
+          "Контент изменился",
+          "Content modified"
+        )}
+      </div>
     </div>
   );
 };

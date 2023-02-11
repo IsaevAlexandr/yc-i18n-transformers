@@ -19,7 +19,7 @@
     "url": "https://github.com/IsaevAlexandr"
   },
   "scripts": {
-    "dev": "npm run build && node yc-i18n-transformers.js",
+    "dev": "NODE_ENV=dev ts-node src",
     "clean": "rimraf lib",
     "build": "tsc -b",
     "prepublishOnly": "npm run clean && npm run build"

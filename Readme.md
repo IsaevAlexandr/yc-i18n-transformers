@@ -30,13 +30,26 @@ npx yc-i18n-transformers --help
   );
   ```
 
+  > You can also omit the first argument (keyset name) and bind the keyset name from the `-b` (bind) option.
+  >
+  > ```tsx
+  > // assume that kayset name come from cli args
+  > const Button = () => (
+  >   <Button>{I18NCODEMOD("parrot", "Попугай", "Parrot")}</Button>
+  > );
+  > ```
+  >
+  > ```sh
+  > npx yc-i18n-transformers -s ui -n I18NCODEMOD -b 'zoo'
+  > ```
+
 - in you project root directory run command:
 
   ```sh
-  npx yc-i18n-transformers -s src/**/*.tsx -n I18NCODEMOD -p "i18n@<keyset>"
+  npx yc-i18n-transformers -s src -n I18NCODEMOD -p "i18n@<keyset>"
   ```
 
-- source files will be formatted into this:
+- source files will be formatted into this code:
 
   ```tsx
   // src/Button.tsx
@@ -57,7 +70,7 @@ npx yc-i18n-transformers --help
   +       │   context.json
   ```
 
-  > Use `-k` option to emit/edit keysets on one dir: `npx yc-i18n-transformers -s src/ui/*.tsx -n I18NCODEMOD -k "src/i18n-keysets"`
+  > Use `-k` option to emit/edit keysets on one dir: `npx yc-i18n-transformers -s src/ui -n I18NCODEMOD -k "src/i18n-keysets"`
 
   ```diff
       src
@@ -76,5 +89,16 @@ npx yc-i18n-transformers --help
 ```sh
 git clone https://github.com/IsaevAlexandr/yc-i18n-transformers.git
 cd yc-i18n-transformers/examples/singleKeysetDir
-npx yc-i18n-transformers -s ui/**/*.(ts|tsx|js|jsx) -k i18n/keysets -n i18nCODEMODE
+npx yc-i18n-transformers -s ui -k i18n/keysets -n i18nCODEMODE
+```
+
+## development
+
+```sh
+npm i
+# for local development try this commands
+npm run dev --  -s examples -n i18nPartial -b foo.bar -k examples/singleKeysetDir/i18n-keysets
+npm run dev --  -s examples -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets
+npm run dev --  -s examples -n i18nCODEMODE -p "i18n@<keyset>"
+npm run dev --  -s examples -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets -f js
 ```

@@ -5,10 +5,13 @@ import { run as jscodeshift } from "jscodeshift/src/Runner";
 import globby from "globby";
 import { KEYSET_REPLACE_KEYWORD } from "./const";
 
+const FILES_EXTENSIONS_TO_TRANSFORM = ["js", "ts", "jsx", "tsx"];
+
 const argv = yargs(hideBin(process.argv))
   .help()
   .option("source", {
     alias: "s",
+    require: true,
     type: "array",
     description:
       'specify dir where to find codemods to replace with "i18n" function call',
@@ -28,14 +31,30 @@ const argv = yargs(hideBin(process.argv))
   .option("name", {
     alias: "n",
     type: "string",
-    default: "i18nCODEMODE",
+    require: true,
+    description: 'Codemode function name to replace with "i18n"',
+  })
+  .option("bind", {
+    alias: "b",
+    type: "string",
     description:
-      'ability to override default "i18nCODEMOD" codemod function name to replace',
+      "Allow to use codemode function without keyset name. Keyset name will be taken from this option",
+  })
+  .option("files", {
+    alias: "f",
+    type: "array",
+    description: `In witch files extensions apply transformation. Default is (${FILES_EXTENSIONS_TO_TRANSFORM.join(
+      "|"
+    )}). For example:\n\t-f js ts`,
   })
 
   .demandOption(
-    ["source"],
-    "Please provide all parameters to correct work of tool"
+    "source",
+    "Specify source file directory. You can specify multiple paths here. For example:\n\t-s src/some/path/to/*\n\t-s src/path/* src/more/path/*"
+  )
+  .demandOption(
+    "name",
+    "You need to specify function name to replace. For example:\n\t-n i18nSomeFn"
   )
   .strict().argv;
 
@@ -43,18 +62,37 @@ const start = async () => {
   // implicit usage of those variables in "updateKeysets" file
   process.env.CODEMODE_FUN_NAME = argv.name;
   process.env.KEYSET_DIRPATTERN = argv.pattern;
+
+  if (argv.bind) {
+    process.env.TRANSFORM_KEYSET_NAME = argv.bind;
+  }
+
   if (argv.keysets) {
     process.env.KEYSETS_ROOT_DIR = argv.keysets;
   }
 
-  const paths = await globby([...argv.source]);
+  const paths = await globby([
+    ...argv.source.map(
+      (s) =>
+        `${s}/**/*.(${(
+          (argv.files as string[]) || FILES_EXTENSIONS_TO_TRANSFORM
+        ).join("|")})`
+    ),
+  ]);
 
   try {
-    await jscodeshift(path.join(__dirname, "transform.js"), paths, {
-      verbose: 0,
-      parser: "tsx",
-      runInBand: true,
-    });
+    await jscodeshift(
+      path.join(
+        __dirname,
+        `transform.${process.env.NODE_ENV === "dev" ? "ts" : "js"}`
+      ),
+      paths,
+      {
+        verbose: 0,
+        parser: "tsx",
+        runInBand: true,
+      }
+    );
   } catch (e) {
     console.error(e);
   }
