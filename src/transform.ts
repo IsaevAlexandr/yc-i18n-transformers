@@ -30,16 +30,16 @@ export default async function (file: FileInfo, api: API, options: Options) {
           path.local?.name !== CODEMODE_FUN_NAME
       );
 
-      // if there is no default i18n import, add it
+      // if there is no i18n import, add it
       if (
         !path.node.specifiers?.find(
           (path) =>
-            path.type === "ImportDefaultSpecifier" &&
+            path.type === "ImportSpecifier" &&
             path.local?.name === TARGET_FN_NAME
         )
       ) {
         path.node.specifiers?.push(
-          j.importDefaultSpecifier(j.identifier(TARGET_FN_NAME))
+          j.importSpecifier(j.identifier(TARGET_FN_NAME))
         );
       }
     });
