@@ -29,7 +29,25 @@ export class Keyset implements KeysetBase {
     return this.value;
   };
 
+  private checkConflictUpdateKey = ({ name, context, ...langs }) => {
+    let hasConflict = false;
+
+    for (const lang in langs) {
+      const currentValue = (langs[lang] as LangPayload)?.value;
+      const prevValue = this._keyset[lang][name];
+      if (prevValue && currentValue !== prevValue) {
+        hasConflict = true;
+      }
+    }
+
+    return hasConflict;
+  }
+
   private updateKeyState = ({ name, context, ...langs }) => {
+    if (this.checkConflictUpdateKey({ name, context, ...langs})) {
+      throw new Error(`Conflict for keyName: "${name}" check usage!`);
+    }
+
     this._keyset.context[name] = context;
 
     for (const key in langs) {
@@ -60,8 +78,8 @@ export class Keyset implements KeysetBase {
     return this.value;
   };
 
-  updateKeys = (butchPayload) => {
-    for (const payload of butchPayload) {
+  updateKeys = (batchPayload) => {
+    for (const payload of batchPayload) {
       this.updateKeyState(payload);
     }
 
@@ -83,7 +101,6 @@ export class Keyset implements KeysetBase {
       }
 
       this._keyset.keyset.status[name][lang] = langs?.[lang]?.allowedStatus;
-      AllowedStatuses.GENERATED;
     }
 
     this.writeSyncKeyset(this._keyset);

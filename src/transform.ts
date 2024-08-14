@@ -93,11 +93,24 @@ export default async function (file: FileInfo, api: API, options: Options) {
         };
       }
 
-      // store keysets data in temporal object
-      data[keyset as string].keyData[keyName as string] = {
+      const newKeyData = {
         ru: ru ?? "",
         en: en ?? "",
-      };
+      }
+
+      const currentKeyData = data[keyset as string].keyData[keyName as string];
+
+      if (
+          currentKeyData && (
+              currentKeyData?.ru !== newKeyData?.ru ||
+              currentKeyData?.en !== newKeyData?.en
+          )
+      ) {
+        throw new Error(`Conflict for keyName: "${keyName}" check usage!`);
+      }
+
+      // store keysets data in temporal object
+      data[keyset as string].keyData[keyName as string] = newKeyData;
 
       const args = path.node.arguments.slice(0, 2);
 
