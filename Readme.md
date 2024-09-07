@@ -97,8 +97,13 @@ npx yc-i18n-transformers -s ui -k i18n/keysets -n i18nCODEMODE
 ```sh
 npm i
 # for local development try this commands
-npm run dev --  -s examples -n i18nPartial -b foo.bar -k examples/singleKeysetDir/i18n-keysets
-npm run dev --  -s examples -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets
-npm run dev --  -s examples -n i18nCODEMODE -p "i18n@<keyset>"
-npm run dev --  -s examples -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets -f js
+npm run dev --  -s examples/singleKeysetDir -n i18nPartial -b foo.bar -k examples/singleKeysetDir/i18n-keysets
+npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets
+npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -p "i18n@<keyset>"
+npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets -f js
+
+npm run dev --  -s examples/tsFormatter -n i18nPartial -b foo.bar -k examples/tsFormatter/i18n-keysets --format ts
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets --format ts
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -p "i18n@<keyset>" --format ts
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets -f js --format ts
 ```

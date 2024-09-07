@@ -1,0 +1,24 @@
+{
+  "context": "",
+  "status": {
+    "already_exists": {
+      "ru": "APPROVED",
+      "en": "APPROVED"
+    },
+    "to_modify": {
+      "ru": "APPROVED",
+      "en": "APPROVED"
+    },
+    "hero_label": {
+      "ru": "EXPIRED",
+      "en": "REQUIRES_TRANSLATION"
+    }
+  },
+  "allowedStatuses": [
+    "APPROVED",
+    "EXPIRED",
+    "GENERATED",
+    "REQUIRES_TRANSLATION",
+    "TRANSLATED"
+  ]
+}

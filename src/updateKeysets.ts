@@ -25,6 +25,7 @@ export const updateKeysets = async (data: DataForKeysets) => {
     );
 
     const keyset = new Keyset(pathToKeyset);
+    await keyset.load();
 
     const batchPayload = Object.entries(data[keysetName].keyData).map(
       ([keyName, { en, ru }]) => {

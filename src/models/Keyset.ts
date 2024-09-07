@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { AllowedStatuses, DEFAULT_KEYSET } from "../const";
 import {
   KeysetBase,
@@ -9,22 +8,58 @@ import {
   LangFiles,
   LangPayload,
 } from "../types";
+import { TypescriptFormatter, JsonFormatter, Formatter } from './formatters';
+
+const getFormatter = (format: string): Formatter => {
+  if (format === 'ts') {
+    return new TypescriptFormatter();
+  }
+
+  if (format === 'json') {
+    return new JsonFormatter();
+  }
+
+  throw new Error(`Uknown formatter ${format}`);
+}
 
 export class Keyset implements KeysetBase {
-  private readonly _keyset: KeysetValue;
+  private _keyset: KeysetValue;
+  private readonly formatter: Formatter;
 
-  constructor(private readonly dirPath: string, initialValue?: KeysetValue) {
-    this._keyset = this.readSyncKeysetValue(initialValue);
+  constructor(private readonly dirPath: string) {
+    this._keyset = DEFAULT_KEYSET;
+    this.formatter = getFormatter(process.env.KEYSET_FORMAT);
   }
 
   get value() {
     return this._keyset;
   }
 
-  update = ({ context }) => {
+  load = async (): Promise<void> => {
+    if (!fs.existsSync(this.dirPath)) {
+      fs.mkdirSync(this.dirPath, { recursive: true });
+    }
+
+    const context = await this.formatter.loadContexts(this.dirPath);
+    const keyset = await this.formatter.loadStatuses(this.dirPath);
+
+    const langs: LangFiles = {ru: DEFAULT_KEYSET.ru, en: DEFAULT_KEYSET.en};
+
+    for (const lang of Object.values(Lang)) {
+      langs[lang] = await this.formatter.loadKeyset(this.dirPath, lang);
+    }
+
+    this._keyset = {
+      context,
+      keyset,
+      ...langs,
+    };
+  };
+
+  update = async ({ context }) => {
     this._keyset.keyset.context = context;
 
-    this.writeSyncKeyset(this._keyset);
+    await this.writeKeyset(this._keyset);
 
     return this.value;
   };
@@ -70,25 +105,25 @@ export class Keyset implements KeysetBase {
 
     return this.value;
   };
-  updateKey = (payload) => {
+  updateKey = async (payload) => {
     this.updateKeyState(payload);
 
-    this.writeSyncKeyset(this._keyset);
+    await this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  updateKeys = (batchPayload) => {
+  updateKeys = async (batchPayload) => {
     for (const payload of batchPayload) {
       this.updateKeyState(payload);
     }
 
-    this.writeSyncKeyset(this._keyset);
+    await this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  createKey = ({ name, context, ...langs }) => {
+  createKey = async ({ name, context, ...langs }) => {
     if (this._keyset.keyset?.status?.[name]) {
       throw new Error(`Key "${name}" already exists`);
     }
@@ -103,12 +138,12 @@ export class Keyset implements KeysetBase {
       this._keyset.keyset.status[name][lang] = langs?.[lang]?.allowedStatus;
     }
 
-    this.writeSyncKeyset(this._keyset);
+    await this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  deleteKey = (name) => {
+  deleteKey = async (name) => {
     if (!this._keyset.keyset.status[name]) {
       throw new Error(`Key "${name}" does not exists`);
     }
@@ -120,13 +155,10 @@ export class Keyset implements KeysetBase {
       delete this._keyset[lang][name];
     }
 
-    this.writeSyncKeyset(this._keyset);
+    await this.writeKeyset(this._keyset);
 
     return this.value;
   };
-
-  private serializeJson = (data: unknown): string =>
-    JSON.stringify(data, null, 2) + "\n";
 
   private sortObjectKeys = (obj: Object) => {
     return Object.keys(obj)
@@ -146,7 +178,7 @@ export class Keyset implements KeysetBase {
     return obj;
   };
 
-  private writeSyncKeyset = async (
+  private writeKeyset = async (
     payload: KeysetValue
   ): Promise<KeysetValue> => {
     if (!fs.existsSync(this.dirPath)) {
@@ -156,66 +188,14 @@ export class Keyset implements KeysetBase {
     // add yargs option and flag here if keys sorting will not be needed
     const sortedKeysPayload = this.sortKeysetKeys(payload);
 
-    fs.writeFileSync(
-      path.join(this.dirPath, "context.json"),
-      this.serializeJson(sortedKeysPayload.context)
-    );
-    fs.writeFileSync(
-      path.join(this.dirPath, "keyset.json"),
-      this.serializeJson(sortedKeysPayload.keyset)
-    );
-
-    for (const lang in Lang) {
-      fs.writeFileSync(
-        path.join(this.dirPath, `${lang}.json`),
-        this.serializeJson(sortedKeysPayload[lang])
-      );
-    }
+    await Promise.all([
+      this.formatter.saveContexts(this.dirPath, sortedKeysPayload.context),
+      this.formatter.saveStatuses(this.dirPath, sortedKeysPayload.keyset),
+      ...Object.values(Lang).map((lang) =>
+        this.formatter.saveKeyset(this.dirPath, lang, sortedKeysPayload[lang])
+      ),
+    ])
 
     return sortedKeysPayload;
-  };
-
-  private readSyncKeysetValue = (
-    initialValue: KeysetValue = DEFAULT_KEYSET
-  ): KeysetValue => {
-    if (!fs.existsSync(this.dirPath)) {
-      fs.mkdirSync(this.dirPath, { recursive: true });
-    }
-
-    const contextFilePath = path.join(this.dirPath, "context.json");
-    const keysetFilePath = path.join(this.dirPath, "keyset.json");
-
-    if (!fs.existsSync(contextFilePath)) {
-      fs.writeFileSync(
-        contextFilePath,
-        this.serializeJson(initialValue.context)
-      );
-    }
-
-    const context = JSON.parse(String(fs.readFileSync(contextFilePath)));
-
-    if (!fs.existsSync(keysetFilePath)) {
-      fs.writeFileSync(keysetFilePath, this.serializeJson(initialValue.keyset));
-    }
-
-    const keyset = JSON.parse(String(fs.readFileSync(keysetFilePath)));
-
-    const langs = Object.values(Lang).reduce((acc, lang) => {
-      const langPath = path.join(this.dirPath, `${lang}.json`);
-
-      if (!fs.existsSync(langPath)) {
-        fs.writeFileSync(langPath, this.serializeJson(initialValue[lang]));
-      }
-
-      acc[lang] = JSON.parse(String(fs.readFileSync(langPath)));
-
-      return acc;
-    }, {} as LangFiles);
-
-    return {
-      context,
-      keyset,
-      ...langs,
-    };
   };
 }
