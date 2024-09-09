@@ -123,7 +123,7 @@ export default async function (file: FileInfo, api: API, options: Options) {
 
   // update keysets files with collected data
   if (Object.keys(data).length > 0) {
-    await updateKeysets(data);
+    updateKeysets(data);
   }
 
   return root.toSource(options.printOptions || printOptions);

@@ -10,7 +10,7 @@ export type DataForKeysets = Record<
   }
 >;
 
-export const updateKeysets = async (data: DataForKeysets) => {
+export const updateKeysets = (data: DataForKeysets) => {
   // if KEYSETS_ROOT_DIR passed assume that we works with keysets in one directory mode
   const keysetsRootDir = process.env.KEYSETS_ROOT_DIR;
   const pattern = process.env.KEYSET_DIRPATTERN;
@@ -25,7 +25,7 @@ export const updateKeysets = async (data: DataForKeysets) => {
     );
 
     const keyset = new Keyset(pathToKeyset);
-    await keyset.load();
+    keyset.load();
 
     const batchPayload = Object.entries(data[keysetName].keyData).map(
       ([keyName, { en, ru }]) => {

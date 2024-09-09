@@ -2,11 +2,11 @@ import { AllowedStatuses } from "../const";
 
 export interface KeysetBase {
   value: KeysetValue;
-  update({ context: string }): Promise<KeysetValue>;
-  updateKey(payload: KeyPayload): Promise<KeysetValue>;
-  updateKeys(payload: KeyPayload[]): Promise<KeysetValue>;
-  createKey(payload: KeyPayload): Promise<KeysetValue>;
-  deleteKey(payload: string): Promise<KeysetValue>;
+  update({ context: string }): KeysetValue;
+  updateKey(payload: KeyPayload): KeysetValue;
+  updateKeys(payload: KeyPayload[]): KeysetValue;
+  createKey(payload: KeyPayload): KeysetValue;
+  deleteKey(payload: string): KeysetValue;
 }
 
 export enum Lang {
