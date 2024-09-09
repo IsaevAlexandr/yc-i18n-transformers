@@ -8,19 +8,19 @@ import {
   LangFiles,
   LangPayload,
 } from "../types";
-import { TypescriptFormatter, JsonFormatter, Formatter } from './formatters';
+import { TypescriptFormatter, JsonFormatter, Formatter } from "./formatters";
 
 const getFormatter = (format: string): Formatter => {
-  if (format === 'ts') {
+  if (format === "ts") {
     return new TypescriptFormatter();
   }
 
-  if (format === 'json') {
+  if (format === "json") {
     return new JsonFormatter();
   }
 
-  throw new Error(`Uknown formatter ${format}`);
-}
+  throw new Error(`Unknown formatter ${format}`);
+};
 
 export class Keyset implements KeysetBase {
   private _keyset: KeysetValue;
@@ -43,7 +43,7 @@ export class Keyset implements KeysetBase {
     const context = await this.formatter.loadContexts(this.dirPath);
     const keyset = await this.formatter.loadStatuses(this.dirPath);
 
-    const langs: LangFiles = {ru: DEFAULT_KEYSET.ru, en: DEFAULT_KEYSET.en};
+    const langs: LangFiles = { ru: DEFAULT_KEYSET.ru, en: DEFAULT_KEYSET.en };
 
     for (const lang of Object.values(Lang)) {
       langs[lang] = await this.formatter.loadKeyset(this.dirPath, lang);
@@ -76,10 +76,10 @@ export class Keyset implements KeysetBase {
     }
 
     return hasConflict;
-  }
+  };
 
   private updateKeyState = ({ name, context, ...langs }) => {
-    if (this.checkConflictUpdateKey({ name, context, ...langs})) {
+    if (this.checkConflictUpdateKey({ name, context, ...langs })) {
       throw new Error(`Conflict for keyName: "${name}" check usage!`);
     }
 
@@ -178,9 +178,7 @@ export class Keyset implements KeysetBase {
     return obj;
   };
 
-  private writeKeyset = async (
-    payload: KeysetValue
-  ): Promise<KeysetValue> => {
+  private writeKeyset = async (payload: KeysetValue): Promise<KeysetValue> => {
     if (!fs.existsSync(this.dirPath)) {
       fs.mkdirSync(this.dirPath, { recursive: true });
     }
@@ -194,7 +192,7 @@ export class Keyset implements KeysetBase {
       ...Object.values(Lang).map((lang) =>
         this.formatter.saveKeyset(this.dirPath, lang, sortedKeysPayload[lang])
       ),
-    ])
+    ]);
 
     return sortedKeysPayload;
   };

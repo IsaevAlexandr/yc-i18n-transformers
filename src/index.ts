@@ -29,11 +29,12 @@ const argv = yargs(hideBin(process.argv))
     description: `specify pattern to keyset folder. For example "i18n@${KEYSET_REPLACE_KEYWORD}" will be replaced with "i18n@some.keyset.name"`,
   })
   .option("format", {
-    alias: "fmt",
+    alias: "f",
     type: "string",
-    default: "json",
+    default: "ts",
     choices: ["ts", "json"],
-    description: "Specify the storage format of your keysets. For example, you can store keyset in json or typescript formats.",
+    description:
+      "Specify the storage format of your keysets. For example, you can store keyset in json or typescript formats.",
   })
   .option("name", {
     alias: "n",
@@ -47,12 +48,12 @@ const argv = yargs(hideBin(process.argv))
     description:
       "Allow to use codemode function without keyset name. Keyset name will be taken from this option",
   })
-  .option("files", {
-    alias: "f",
+  .option("include", {
+    alias: "i",
     type: "array",
-    description: `In witch files extensions apply transformation. Default is (${FILES_EXTENSIONS_TO_TRANSFORM.join(
+    description: `What files include to transform. Default is (${FILES_EXTENSIONS_TO_TRANSFORM.join(
       "|"
-    )}). For example:\n\t-f js ts`,
+    )}). For example:\n\t-i (js|ts)`,
   })
 
   .demandOption(

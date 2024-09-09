@@ -100,10 +100,10 @@ npm i
 npm run dev --  -s examples/singleKeysetDir -n i18nPartial -b foo.bar -k examples/singleKeysetDir/i18n-keysets
 npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets
 npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -p "i18n@<keyset>"
-npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets -f js
+npm run dev --  -s examples/singleKeysetDir -n i18nCODEMODE -k examples/singleKeysetDir/i18n-keysets --include js
 
-npm run dev --  -s examples/tsFormatter -n i18nPartial -b foo.bar -k examples/tsFormatter/i18n-keysets --format ts
-npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets --format ts
-npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -p "i18n@<keyset>" --format ts
-npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets -f js --format ts
+npm run dev --  -s examples/tsFormatter -n i18nPartial -b foo.bar -k examples/tsFormatter/i18n-keysets -f json
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets --format json
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -p "i18n@<keyset>" --format json
+npm run dev --  -s examples/tsFormatter -n i18nCODEMODE -k examples/tsFormatter/i18n-keysets -i js -f json
 ```
