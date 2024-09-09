@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs/promises";
+import fs from "fs";
 import {LangFile, KeysetFile, ContextFile} from "../../types";
 import { DEFAULT_KEYSET } from "../../const";
 
@@ -34,9 +34,9 @@ export abstract class Formatter {
      */
     abstract formatKeyset(data: LangFile, language: string): string;
 
-    async loadKeyset(dirname: string, language: string) {
+    loadKeyset(dirname: string, language: string) {
         try {
-            const content = await this.load(dirname, language);
+            const content = this.load(dirname, language);
             return this.parseKeyset(content, language);
         } catch (err) {
              // no such file or directory
@@ -48,14 +48,14 @@ export abstract class Formatter {
         return {};
     }
 
-    async saveKeyset(dirname: string, language: string, data: LangFile) {
+    saveKeyset(dirname: string, language: string, data: LangFile) {
         const content = this.formatKeyset(data, language);
         return this.save(dirname, language, content);
     }
 
-    async loadContexts(dirname: string): Promise<ContextFile> {
+    loadContexts(dirname: string): ContextFile {
         try {
-            const data = await this.load(dirname, CONTEXT_FILE_NAME);
+            const data = this.load(dirname, CONTEXT_FILE_NAME);
             return JSON.parse(data);
         } catch (err) {
             // no such file or directory
@@ -67,13 +67,13 @@ export abstract class Formatter {
         return DEFAULT_KEYSET.context;
     }
 
-    saveContexts(dirname: string, data: ContextFile): Promise<void> {
+    saveContexts(dirname: string, data: ContextFile) {
         return this.save(dirname, CONTEXT_FILE_NAME, JSON.stringify(data, null, 2));
     }
 
-    async loadStatuses(dirname: string): Promise<KeysetFile> {
+    loadStatuses(dirname: string): KeysetFile {
         try {
-            const data = await this.load(dirname, STATUSES_FILE_NAME);
+            const data = this.load(dirname, STATUSES_FILE_NAME);
             return JSON.parse(data);
         } catch (err) {
             // no such file or directory
@@ -85,7 +85,7 @@ export abstract class Formatter {
         return DEFAULT_KEYSET.keyset;
     }
 
-    saveStatuses(dirname: string, data: KeysetFile): Promise<void> {
+    saveStatuses(dirname: string, data: KeysetFile) {
         return this.save(dirname, STATUSES_FILE_NAME, JSON.stringify(data, null, 2));
     }
 
@@ -103,16 +103,16 @@ export abstract class Formatter {
             : filename;
     }
 
-    protected async load(dirname: string, filename: string) {
+    protected load(dirname: string, filename: string) {
         const fullname = path.resolve(dirname, this.appendExtension(filename));
 
-        return fs.readFile(fullname, {
+        return fs.readFileSync(fullname, {
             encoding: 'utf-8',
         });
     }
 
-    protected async save(dirname: string, filename: string, data: string) {
+    protected save(dirname: string, filename: string, data: string) {
         const content = ensureTrailingNewLine(data);
-        await fs.writeFile(path.resolve(dirname, this.appendExtension(filename)), content);
+        fs.writeFileSync(path.resolve(dirname, this.appendExtension(filename)), content);
     }
 }

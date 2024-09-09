@@ -35,18 +35,18 @@ export class Keyset implements KeysetBase {
     return this._keyset;
   }
 
-  load = async (): Promise<void> => {
+  load = () => {
     if (!fs.existsSync(this.dirPath)) {
       fs.mkdirSync(this.dirPath, { recursive: true });
     }
 
-    const context = await this.formatter.loadContexts(this.dirPath);
-    const keyset = await this.formatter.loadStatuses(this.dirPath);
+    const context = this.formatter.loadContexts(this.dirPath);
+    const keyset = this.formatter.loadStatuses(this.dirPath);
 
     const langs: LangFiles = { ru: DEFAULT_KEYSET.ru, en: DEFAULT_KEYSET.en };
 
     for (const lang of Object.values(Lang)) {
-      langs[lang] = await this.formatter.loadKeyset(this.dirPath, lang);
+      langs[lang] = this.formatter.loadKeyset(this.dirPath, lang);
     }
 
     this._keyset = {
@@ -56,10 +56,9 @@ export class Keyset implements KeysetBase {
     };
   };
 
-  update = async ({ context }) => {
+  update = ({ context }) => {
     this._keyset.keyset.context = context;
-
-    await this.writeKeyset(this._keyset);
+    this.writeKeyset(this._keyset);
 
     return this.value;
   };
@@ -105,25 +104,25 @@ export class Keyset implements KeysetBase {
 
     return this.value;
   };
-  updateKey = async (payload) => {
-    this.updateKeyState(payload);
 
-    await this.writeKeyset(this._keyset);
+  updateKey = (payload) => {
+    this.updateKeyState(payload);
+    this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  updateKeys = async (batchPayload) => {
+  updateKeys = (batchPayload) => {
     for (const payload of batchPayload) {
       this.updateKeyState(payload);
     }
 
-    await this.writeKeyset(this._keyset);
+    this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  createKey = async ({ name, context, ...langs }) => {
+  createKey = ({ name, context, ...langs }) => {
     if (this._keyset.keyset?.status?.[name]) {
       throw new Error(`Key "${name}" already exists`);
     }
@@ -138,12 +137,12 @@ export class Keyset implements KeysetBase {
       this._keyset.keyset.status[name][lang] = langs?.[lang]?.allowedStatus;
     }
 
-    await this.writeKeyset(this._keyset);
+    this.writeKeyset(this._keyset);
 
     return this.value;
   };
 
-  deleteKey = async (name) => {
+  deleteKey = (name) => {
     if (!this._keyset.keyset.status[name]) {
       throw new Error(`Key "${name}" does not exists`);
     }
@@ -155,7 +154,7 @@ export class Keyset implements KeysetBase {
       delete this._keyset[lang][name];
     }
 
-    await this.writeKeyset(this._keyset);
+    this.writeKeyset(this._keyset);
 
     return this.value;
   };
@@ -178,7 +177,7 @@ export class Keyset implements KeysetBase {
     return obj;
   };
 
-  private writeKeyset = async (payload: KeysetValue): Promise<KeysetValue> => {
+  private writeKeyset = (payload: KeysetValue): KeysetValue => {
     if (!fs.existsSync(this.dirPath)) {
       fs.mkdirSync(this.dirPath, { recursive: true });
     }
@@ -186,13 +185,12 @@ export class Keyset implements KeysetBase {
     // add yargs option and flag here if keys sorting will not be needed
     const sortedKeysPayload = this.sortKeysetKeys(payload);
 
-    await Promise.all([
-      this.formatter.saveContexts(this.dirPath, sortedKeysPayload.context),
-      this.formatter.saveStatuses(this.dirPath, sortedKeysPayload.keyset),
-      ...Object.values(Lang).map((lang) =>
-        this.formatter.saveKeyset(this.dirPath, lang, sortedKeysPayload[lang])
-      ),
-    ]);
+    this.formatter.saveContexts(this.dirPath, sortedKeysPayload.context);
+    this.formatter.saveStatuses(this.dirPath, sortedKeysPayload.keyset);
+
+    Object.values(Lang).forEach((lang) => {
+      this.formatter.saveKeyset(this.dirPath, lang, sortedKeysPayload[lang])
+    });
 
     return sortedKeysPayload;
   };
