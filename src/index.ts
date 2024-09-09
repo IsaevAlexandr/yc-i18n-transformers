@@ -28,6 +28,13 @@ const argv = yargs(hideBin(process.argv))
     default: KEYSET_REPLACE_KEYWORD,
     description: `specify pattern to keyset folder. For example "i18n@${KEYSET_REPLACE_KEYWORD}" will be replaced with "i18n@some.keyset.name"`,
   })
+  .option("format", {
+    alias: "fmt",
+    type: "string",
+    default: "json",
+    choices: ["ts", "json"],
+    description: "Specify the storage format of your keysets. For example, you can store keyset in json or typescript formats.",
+  })
   .option("name", {
     alias: "n",
     type: "string",
@@ -62,6 +69,7 @@ const start = async () => {
   // implicit usage of those variables in "updateKeysets" file
   process.env.CODEMODE_FUN_NAME = argv.name;
   process.env.KEYSET_DIRPATTERN = argv.pattern;
+  process.env.KEYSET_FORMAT = argv.format;
 
   if (argv.bind) {
     process.env.TRANSFORM_KEYSET_NAME = argv.bind;

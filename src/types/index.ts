@@ -2,11 +2,11 @@ import { AllowedStatuses } from "../const";
 
 export interface KeysetBase {
   value: KeysetValue;
-  update({ context: string }): KeysetValue;
-  updateKey(payload: KeyPayload): KeysetValue;
-  updateKeys(payload: KeyPayload[]): KeysetValue;
-  createKey(payload: KeyPayload): KeysetValue;
-  deleteKey(payload: string): KeysetValue;
+  update({ context: string }): Promise<KeysetValue>;
+  updateKey(payload: KeyPayload): Promise<KeysetValue>;
+  updateKeys(payload: KeyPayload[]): Promise<KeysetValue>;
+  createKey(payload: KeyPayload): Promise<KeysetValue>;
+  deleteKey(payload: string): Promise<KeysetValue>;
 }
 
 export enum Lang {
@@ -25,7 +25,7 @@ export interface ContextFile {
   [s: string]: string;
 }
 
-type LangFileValue = string[] | string;
+export type LangFileValue = string[] | string | Record<string, string>;
 export interface LangFile {
   [s: string]: LangFileValue;
 }
