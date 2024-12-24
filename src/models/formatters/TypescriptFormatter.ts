@@ -4,7 +4,7 @@ import traverse from '@babel/traverse';
 import { parse, ParserPlugin } from '@babel/parser';
 import { Node } from "@babel/traverse";
 
-const FILE_TEMPLATE = 'export default {{KEYSET}};';
+const FILE_TEMPLATE = 'export default {{KEYSET}} as const;';
 
 function parseKey(node: Node): string | undefined {
     if (node.type === 'Identifier') {
